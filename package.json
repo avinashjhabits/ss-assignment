@@ -7,7 +7,7 @@
     "start": "node notification_service.js",
     "test": "npm test"
   },
-  "author": "chandra.bhanu",
+  "author": "avinash.jha",
   "license": "ISC",
   "dependencies": {
     "@bull-board/express": "^6.3.3",

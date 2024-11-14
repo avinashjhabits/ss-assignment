@@ -1,13 +1,19 @@
+const express = require('express');
 const mongoose = require('mongoose');
-const { Worker } = require('bullmq');
+const jwt = require('jsonwebtoken');
+const { Queue, Worker } = require('bullmq');
 const IORedis = require('ioredis');
-const nodemailer = require('nodemailer');
 
-const fromMailId = "xyz@gmail.com"
-const fromMailPassword = "myPassword"
+const nodemailer = require('nodemailer');
+const app = express();
+app.use(express.json());
+
+const fromMailId = "ssassignmentmailer@gmail.com"
+const fromMailPassword = "breq spoq cxbv nbnn"
 
 // Connect to MongoDB
 mongoose.connect('mongodb://localhost:27017/bankingApp', { useNewUrlParser: true, useUnifiedTopology: true });
+
 // User schema
 const userSchema = new mongoose.Schema({
     userId: String,
@@ -26,8 +32,8 @@ const redisConnection = new IORedis({
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: fromMailId, // Use a real email account
-        pass: fromMailPassword   // Use real password or app-specific password for security
+        user: fromMailId,
+        pass: fromMailPassword
     }
 });
 
@@ -61,14 +67,12 @@ const notificationWorker = new Worker('transactionQueue', async job => {
                 console.log(`Email sent: ${info.response}`);
             }
         });
-
-        console.log(`Notification sent for transaction from ${fromUserId} to ${toUserId} for amount ${amount}.`);
+        
+        console.log(`Notification sent for transaction from ${fromUserId} (${fromMailId}) to ${toUserId} (${toUser.email}) for amount ${amount}.`);
     } catch (error) {
         console.error(`Error processing job: ${error.message}`);
     }
-}, {
-    connection: redisConnection
-});
+}, { connection: redisConnection });
 
 // Log errors from the worker
 notificationWorker.on('failed', (job, err) => {
